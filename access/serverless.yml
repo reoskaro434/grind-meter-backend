@@ -1,0 +1,60 @@
+service: ${self:custom.prefix}-access
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: ${opt:region}
+  stage: ${opt:stage}
+  stackName: ${self:custom.prefix}-access
+  iam:
+    role:
+      name: ${self:custom.prefix}-access-role
+      statements:
+        - Effect: 'Allow'
+          Resource: '*'
+          Action: 'iam:DeleteBucket'
+  deploymentBucket:
+    name: ${self:custom.prefix}-deployments
+
+
+plugins:
+  - serverless-deployment-bucket
+
+custom:
+  prefix: grind-meter-${self:provider.stage}-${self:provider.region}
+
+resources:
+  Resources:
+    GrindMeterUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        AliasAttributes:
+          - preferred_username
+          - email
+        AutoVerifiedAttributes:
+          - email
+        UsernameConfiguration:
+          CaseSensitive: False
+        UserPoolName: ${self:custom.prefix}-user-pool
+    GrindMeterUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        AccessTokenValidity: 5
+        ClientName: ${self:custom.prefix}
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        GenerateSecret: True
+        IdTokenValidity: 5
+        PreventUserExistenceErrors: ENABLED
+        RefreshTokenValidity: 30
+        UserPoolId: !Ref GrindMeterUserPool
+        TokenValidityUnits:
+          AccessToken: minutes
+          IdToken: minutes
+          RefreshToken: days
+        WriteAttributes:
+          - preferred_username
+          - email

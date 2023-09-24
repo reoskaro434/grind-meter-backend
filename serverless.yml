@@ -1,0 +1,54 @@
+service: ${self:custom.prefix}-backend
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  variablesResolutionMode: 20210326
+  region: ${opt:region}
+  stage: ${opt:stage}
+  stackName: ${self:custom.prefix}-backend
+  iam:
+    role:
+      name: ${self:custom.prefix}-backend-role
+      statements:
+        - Effect: 'Allow'
+          Action: '*'
+          Resource: '*'
+  deploymentBucket:
+    name: ${self:custom.prefix}-deployments
+  environment:
+    REGION: ${opt:region}
+    STAGE: ${opt:stage}
+
+custom:
+  prefix: perfect-projects-${self:provider.stage}-${self:provider.region}
+  wsgi:
+    app: backend.app
+  customCertificate:
+    certificateName: api-${opt:stage}-${opt:region}.perfect-projects.link
+    hostedZoneIds: Z046301435EGQHE8A33R6
+    region: us-east-1 # This specific region is required due to an error from Serverless Domain Manager
+  customDomain:
+    domainName: api-${opt:stage}-${opt:region}.perfect-projects.link
+    certificateName: api-${opt:stage}-${opt:region}.perfect-projects.link
+    createRoute53Record: true
+    endpointType: edge
+    securityPolicy: tls_1_2
+    apiType: rest
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
+
+plugins:
+  - serverless-deployment-bucket
+  - serverless-wsgi
+  - serverless-python-requirements
+  - serverless-certificate-creator
+  - serverless-domain-manager

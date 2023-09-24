@@ -1,0 +1,29 @@
+{
+  "name": "perfect-projects-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PerfectProjects/perfect-projects-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PerfectProjects/perfect-projects-backend/issues"
+  },
+  "homepage": "https://github.com/PerfectProjects/perfect-projects-backend#readme",
+  "dependencies": {
+    "serverless": "^2.62.0"
+  },
+  "devDependencies": {
+    "serverless-certificate-creator": "^1.6.0",
+    "serverless-deployment-bucket": "^1.5.1",
+    "serverless-domain-manager": "^5.2.0",
+    "serverless-python-requirements": "^5.1.1",
+    "serverless-wsgi": "^2.0.2"
+  }
+}

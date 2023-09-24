@@ -1,0 +1,23 @@
+{
+  "name": "grind-meter-access",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PerfectProjects/perfect-projects-access.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PerfectProjects/perfect-projects-access/issues"
+  },
+  "homepage": "https://github.com/PerfectProjects/perfect-projects-access#readme",
+  "dependencies": {
+    "serverless": "^2.60.0",
+    "serverless-deployment-bucket": "^1.5.1"
+  }
+}
