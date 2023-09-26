@@ -4,8 +4,8 @@
 # import flask
 # from flask import g, request
 #
-# from backend.aws.cognito_provider import CognitoProvider
-# from backend.aws.secret_provider import SecretProvider
+# from backend.app.aws.cognito_provider import CognitoProvider
+# from backend.app.aws.secret_provider import SecretProvider
 #
 #
 # def require_authentication(f):

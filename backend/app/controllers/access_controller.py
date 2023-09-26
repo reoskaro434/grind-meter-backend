@@ -3,9 +3,9 @@ import os
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from backend.aws.cognito_provider import CognitoProvider
-from backend.aws.secret_provider import SecretProvider
-from backend.globals import REFRESH_TOKEN_EXPIRE
+from backend.app.aws.cognito_provider import CognitoProvider
+from backend.app.aws.secret_provider import SecretProvider
+from backend.app.globals import REFRESH_TOKEN_EXPIRE
 from datetime import datetime
 
 

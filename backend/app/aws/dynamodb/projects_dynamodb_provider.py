@@ -5,7 +5,7 @@ import uuid
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
-from backend.aws.dynamodb.base_dynamodb_provider import BaseDynamodbProvider
+from backend.app.aws.dynamodb.base_dynamodb_provider import BaseDynamodbProvider
 
 
 class ProjectsDynamodbProvider(BaseDynamodbProvider):

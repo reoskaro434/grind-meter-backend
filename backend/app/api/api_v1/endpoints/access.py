@@ -1,19 +1,18 @@
 from fastapi import APIRouter, Request, Header
 from pydantic import BaseModel
 
-from backend.controllers.access_controller import AccessController
-# from backend.decorators import require_authentication
+from backend.app.controllers.access_controller import AccessController
+# from backend.app.decorators import require_authentication
 
-ACCESS_ROUTER = APIRouter()
+router = APIRouter()
 
 
 class NewUser(BaseModel):
     newUser: dict
 
 
-@ACCESS_ROUTER.post('/access/sign-up')
+@router.post('/sign-up')
 def sign_up_endpoint(new_user: NewUser):
-    print('hello')
     return AccessController().create_account(new_user.newUser)
 
 
@@ -21,12 +20,12 @@ class User(BaseModel):
     user: dict
 
 
-@ACCESS_ROUTER.post("/access/sign-in")
+@router.post("/sign-in")
 def sign_in_endpoint(user: User):
     return AccessController().sign_in(user.user)
 
 
-@ACCESS_ROUTER.get("/access/refresh-token")
+@router.get("/refresh-token")
 def refresh_token_endpoint(request: Request):
     ref_token = request.cookies.get("refreshToken")
     username = request.headers.get("username")
@@ -38,12 +37,12 @@ class VerifyAccount(BaseModel):
     confirmationCode: str
 
 
-@ACCESS_ROUTER.post('/access/verify-account')
+@router.post('/verify-account')
 def verify_account_endpoint(verify_account: VerifyAccount):
     return AccessController().verify_account(verify_account.username, verify_account.confirmationCode)
 
 
-@ACCESS_ROUTER.post('/access/sign-out')
+@router.post('/sign-out')
 # @require_authentication
 def sign_out_endpoint(access_token: str = Header(None)):
     return AccessController().sign_out(access_token)

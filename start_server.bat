@@ -1,1 +1,1 @@
-pipenv run uvicorn backend.main:app --reload --host=api.grind-meter.com --ssl-certfile=cert/grind-meter.cert.pem --ssl-keyfile=cert/grind-meter.key.pem
+pipenv run uvicorn backend.app.main:app --reload --host=api.grind-meter.com --ssl-certfile=cert/grind-meter.cert.pem --ssl-keyfile=cert/grind-meter.key.pem
