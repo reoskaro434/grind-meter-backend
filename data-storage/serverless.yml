@@ -1,0 +1,104 @@
+service: ${self:custom.prefix}-data-storage
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  region: ${opt:region}
+  stage: ${opt:stage}
+  stackName: ${self:custom.prefix}-data-storage
+  iam:
+    role:
+      name: ${self:custom.prefix}-data-storage-role
+      statements:
+        - Effect: 'Allow'
+          Resource: '*'
+          Action: 'iam:DeleteBucket'
+  deploymentBucket:
+    name: ${self:custom.prefix}-deployments
+
+plugins:
+  - serverless-deployment-bucket
+
+custom:
+  prefix: grind-meter-${self:provider.stage}-${self:provider.region}
+
+resources:
+    Resources:
+        grindMeterStorage:
+          Type: AWS::S3::Bucket
+          Properties:
+            AccessControl: Private
+            BucketName: ${self:custom.prefix}-storage
+        grindMeterProjectTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:custom.prefix}-projects
+                AttributeDefinitions:
+                    - AttributeName: id
+                      AttributeType: S
+                    - AttributeName: user_id
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: id
+                      KeyType: HASH
+                GlobalSecondaryIndexes:
+                  - IndexName: user_id
+                    KeySchema:
+                      - AttributeName: user_id
+                        KeyType: HASH
+                    Projection:
+                      ProjectionType: "ALL"
+                BillingMode: PAY_PER_REQUEST
+        grindMeterScoresTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.prefix}-scores
+            AttributeDefinitions:
+              - AttributeName: project_id
+                AttributeType: S
+              - AttributeName: user_id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+              - AttributeName: project_id
+                KeyType: RANGE
+            GlobalSecondaryIndexes:
+              - IndexName: project_id
+                KeySchema:
+                  - AttributeName: project_id
+                    KeyType: HASH
+                Projection:
+                  ProjectionType: "ALL"
+            BillingMode: PAY_PER_REQUEST
+        grindMeterSavedProjectsTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.prefix}-saved-projects
+            AttributeDefinitions:
+              - AttributeName: project_id
+                AttributeType: S
+              - AttributeName: user_id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+              - AttributeName: project_id
+                KeyType: RANGE
+            GlobalSecondaryIndexes:
+              - IndexName: user_id
+                KeySchema:
+                  - AttributeName: user_id
+                    KeyType: HASH
+                Projection:
+                  ProjectionType: "ALL"
+              - IndexName: project_id
+                KeySchema:
+                  - AttributeName: project_id
+                    KeyType: HASH
+                Projection:
+                  ProjectionType: "ALL"
+            BillingMode: PAY_PER_REQUEST
