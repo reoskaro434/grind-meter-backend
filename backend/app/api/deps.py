@@ -1,15 +1,21 @@
-import os
+
+from fastapi import HTTPException, Request, Depends
+from typing import Annotated
 
 from backend.app.aws.cognito_provider import CognitoProvider
 from backend.app.aws.secret_provider import SecretProvider
-from fastapi import HTTPException
+from backend.app.global_settings import global_settings as g
+from backend.app.schemas.user import UserAuthorized
 
 
-def get_current_user(access_token: str):
+async def get_current_user(request: Request):
+    access_token = request.headers.get('access_token')
+
     cognito_pool_data = SecretProvider(
-        os.environ.get("REGION", "eu-central-1"),
-        os.environ.get("STAGE", "dev")
+       g.REGION,
+       g.POOL_CLIENT_DATA_SECRET_NAME
     ).get_secret()
+
     cognito_provider = CognitoProvider(
         cognito_pool_data.get("COGNITO_POOL_CLIENT_ID"),
         cognito_pool_data.get("COGNITO_POOL_CLIENT_SECRET"))
@@ -18,4 +24,9 @@ def get_current_user(access_token: str):
     if not user:
         raise HTTPException(status_code=403, detail="Cannot get current user")
 
-    return user
+    user_authorized = UserAuthorized(access_token=access_token, username=user.get("Username"))
+
+    return user_authorized
+
+
+UserDep = Annotated[UserAuthorized, Depends(get_current_user)]

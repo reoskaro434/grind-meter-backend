@@ -1,21 +1,19 @@
 import base64
-import os
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from backend.app.aws.cognito_provider import CognitoProvider
 from backend.app.aws.secret_provider import SecretProvider
-from backend.app.globals import REFRESH_TOKEN_EXPIRE
 from datetime import datetime
-
+from backend.app.global_settings import global_settings as g
 
 class AccessController:
     def __init__(self):
-        region = os.environ.get("REGION", "eu-central-1")
-        stage = os.environ.get("STAGE", "dev")
+        region = g.REGION
+        stage = g.STAGE
         self._cognito_pool_data = SecretProvider(
             region,
-            f"GRIND_METER_COGNITO_POOL_CLIENT_DATA_{stage.upper()}_{region.upper()}"
+            g.POOL_CLIENT_DATA_SECRET_NAME
         ).get_secret()
         self._cognito_provider = CognitoProvider(
             self._cognito_pool_data.get("COGNITO_POOL_CLIENT_ID"),
@@ -30,16 +28,17 @@ class AccessController:
             response = JSONResponse(content={"payload": payload})
             response.set_cookie(key="refreshToken",
                                 value=cognito_result["AuthenticationResult"]["RefreshToken"],
-                                samesite="none",
+                                samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                expires=datetime.now().timestamp() + REFRESH_TOKEN_EXPIRE * 60)
+                                domain=".api.grind-meter.com",
+                                expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
             response.set_cookie(key="username",
                                 value=base64.b64encode(user.get("username").encode()).decode(),
                                 samesite="none",
                                 secure=True,
-                                domain="grind-meter.com",
-                                expires=datetime.now().timestamp() + REFRESH_TOKEN_EXPIRE * 60)
+                                domain=".grind-meter.com",
+                                expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
             return response
         raise HTTPException(status_code=401)
 
@@ -70,7 +69,7 @@ class AccessController:
     def sign_out(self, access_token):
         result = self._cognito_provider.sign_out(access_token)
 
-        if result is True:
-            return {"success": result}
+        if result:
+            return True
 
         raise HTTPException(status_code=500)
