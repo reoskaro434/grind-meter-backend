@@ -1,21 +1,6 @@
 {
-  "name": "perfect-projects-backend",
+  "name": "grind-meter-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PerfectProjects/perfect-projects-backend.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/PerfectProjects/perfect-projects-backend/issues"
-  },
-  "homepage": "https://github.com/PerfectProjects/perfect-projects-backend#readme",
   "dependencies": {
     "serverless": "^2.62.0"
   },
