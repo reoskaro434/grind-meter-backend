@@ -9,7 +9,7 @@ from backend.app.schemas.user import UserAuthorized
 
 
 async def get_current_user(request: Request):
-    access_token = request.headers.get('access_token')
+    access_token = request.headers.get('authorization')
 
     cognito_pool_data = SecretProvider(
        g.REGION,
