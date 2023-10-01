@@ -32,7 +32,7 @@ resources:
           Properties:
             AccessControl: Private
             BucketName: ${self:custom.prefix}-storage
-        exercises:
+        userExercise:
             Type: AWS::DynamoDB::Table
             Properties:
                 TableName: ${self:custom.prefix}-user-exercise
@@ -46,8 +46,15 @@ resources:
                     KeyType: HASH
                   - AttributeName: exercise_id
                     KeyType: RANGE
+                GlobalSecondaryIndexes:
+                  - IndexName: user_id
+                    KeySchema:
+                      - AttributeName: user_id
+                        KeyType: HASH
+                    Projection:
+                      ProjectionType: "ALL"
                 BillingMode: PAY_PER_REQUEST
-        userExercisesReport:
+        userExerciseReport:
           Type: AWS::DynamoDB::Table
           Properties:
             TableName: ${self:custom.prefix}-user-exercise-report

@@ -1,6 +1,9 @@
 import io
 import json
 import os
+from typing import List
+
+from fastapi import HTTPException
 
 from backend.app.aws.dynamodb.user_exercise_dynamodb_provider import UserExerciseDynamodbProvider
 from backend.app.schemas.exercise import Exercise
@@ -17,6 +20,21 @@ class UserExerciseController:
 
     def add_exercise(self, user_exercise: NewExercise, user: User):
         return self.__user_exercise_db.add(user.email, user_exercise)
+
+    def get_exercise_page(self, user_id, page):
+        items = self.__user_exercise_db.get_exercise_page(user_id, page)
+        if items:
+            exercise_list = []
+            for item in items:
+                exercise_list.append({
+                    "id": item.get("exercise_id"),
+                    "name": item.get("name"),
+                    "type": item.get("type")
+                })
+            return exercise_list
+
+        raise HTTPException(status_code=404, detail="No exercises found")
+
 
     # def get_project(self, project_id):
     #     result = self._dynamodb.get_project(project_id)
@@ -67,28 +85,7 @@ class UserExerciseController:
 
 
 
-    # def get_projects_page(self, page):
-    #     items = self._dynamodb.get_projects(page)
-    #     if items:
-    #         projects = []
-    #         for item in items:
-    #             if item.get("visible"):
-    #                 item_id = item.get("id")
-    #                 item_picture = self._s3.get_file(f"{item_id}/picture").get("Body").read().decode("ascii")
-    #                 projects.append({
-    #                     "id": item_id,
-    #                     "title": item.get("title"),
-    #                     "mainPicture": item_picture,
-    #                     "author": item.get("user_id"),
-    #                     "briefDescription": item.get("brief_description"),
-    #                     "visible": item.get("visible"),
-    #                     "timestamp": int(item.get("last_timestamp"))
-    #                 })
-    #         return Response(json.dumps({"projects": projects}),
-    #                         status=200,
-    #                         mimetype='application/json')
-    #     return Response(status=404, mimetype='application/json')
-    #
+
     # def update_project(self, project_data):
     #     response = self._dynamodb.update_project(project_data)
     #

@@ -21,7 +21,7 @@ async def get_current_user(request: Request):
 
     user = cognito_provider.get_user(access_token)
     if not user:
-        raise HTTPException(status_code=403, detail="Cannot get current user")
+        raise HTTPException(status_code=401, detail="Cannot get current user")
 
     # Get email from array of obj
     email_obj = [obj for obj in user.get("UserAttributes") if obj.get("Name") == "email"]

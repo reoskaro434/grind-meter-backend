@@ -1,13 +1,9 @@
-import calendar
-import datetime
 import uuid
 
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 from backend.app.aws.dynamodb.base_dynamodb_provider import BaseDynamodbProvider
-from backend.app.schemas.exercise import Exercise
-from backend.app.schemas.lift_exercise_report import LiftExerciseReport
 from backend.app.schemas.new_exercise import NewExercise
 
 
@@ -29,6 +25,31 @@ class UserExerciseDynamodbProvider(BaseDynamodbProvider):
             return False
 
         return True
+
+    def get_exercise_page(self, user_id: str, page: int):
+        limit = 25
+        try:
+            response = self.table.query(
+                Limit=limit,
+                IndexName="user_id",
+                KeyConditionExpression=Key("user_id").eq(user_id)
+            )
+
+            for x in range(page - 1):
+                last_evaluated_key = response.get("LastEvaluatedKey")
+                if last_evaluated_key is None:
+                    break
+                response = self.table.query(
+                    Limit=limit,
+                    IndexName="user_id",
+                    KeyConditionExpression=Key("user_id").eq(user_id),
+                    ExclusiveStartKey=response.get("LastEvaluatedKey")
+                )
+            items = response.get("Items")
+        except ClientError as error:
+            print(error)
+            return False
+        return items
     #
     # def get_all_user_projects(self, user_id):
     #     try:

@@ -12,3 +12,8 @@ router = APIRouter()
 @router.post('/add-exercise')
 async def add_user_exercise(exercise: NewExercise, user: UserDep):
     return UserExerciseController().add_exercise(exercise, user)
+
+
+@router.get('/get-exercise/{page}')
+async def add_user_exercise(user: UserDep, page: int):
+    return UserExerciseController().get_exercise_page(user.email, page)
