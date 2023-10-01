@@ -35,7 +35,7 @@ resources:
         exercises:
             Type: AWS::DynamoDB::Table
             Properties:
-                TableName: ${self:custom.prefix}-user-exercises
+                TableName: ${self:custom.prefix}-user-exercise
                 AttributeDefinitions:
                     - AttributeName: user_id
                       AttributeType: S
@@ -50,7 +50,7 @@ resources:
         userExercisesReport:
           Type: AWS::DynamoDB::Table
           Properties:
-            TableName: ${self:custom.prefix}-user-exercises-reports
+            TableName: ${self:custom.prefix}-user-exercise-report
             AttributeDefinitions:
               - AttributeName: exercise_id-user_id
                 AttributeType: S

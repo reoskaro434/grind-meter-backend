@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 
 
-class UserBase(BaseModel):
+class User(BaseModel):
     username: str
+    email: str
 
 
-class UserAuthorized(UserBase):
+class UserAuthorized(User):
     access_token: str
 

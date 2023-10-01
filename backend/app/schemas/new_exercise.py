@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 
-class Exercise(BaseModel):
-    id: str
+class NewExercise(BaseModel):
     name: str
     type: str

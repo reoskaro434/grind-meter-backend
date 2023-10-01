@@ -1,4 +1,3 @@
-
 from fastapi import HTTPException, Request, Depends
 from typing import Annotated
 
@@ -12,8 +11,8 @@ async def get_current_user(request: Request):
     access_token = request.headers.get('authorization')
 
     cognito_pool_data = SecretProvider(
-       g.REGION,
-       g.POOL_CLIENT_DATA_SECRET_NAME
+        g.REGION,
+        g.POOL_CLIENT_DATA_SECRET_NAME
     ).get_secret()
 
     cognito_provider = CognitoProvider(
@@ -24,7 +23,14 @@ async def get_current_user(request: Request):
     if not user:
         raise HTTPException(status_code=403, detail="Cannot get current user")
 
-    user_authorized = UserAuthorized(access_token=access_token, username=user.get("Username"))
+    # Get email from array of obj
+    email_obj = [obj for obj in user.get("UserAttributes") if obj.get("Name") == "email"]
+
+    user_authorized = UserAuthorized(
+        access_token=access_token,
+        username=user.get("Username"),
+        email=email_obj.pop().get("Value")
+    )
 
     return user_authorized
 
