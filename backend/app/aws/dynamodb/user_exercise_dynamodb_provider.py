@@ -4,19 +4,21 @@ from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 from backend.app.aws.dynamodb.base_dynamodb_provider import BaseDynamodbProvider
-from backend.app.schemas.new_exercise import NewExercise
+
+from backend.app.schemas.exercise import Exercise
 
 
 class UserExerciseDynamodbProvider(BaseDynamodbProvider):
     def __init__(self, region, stage):
         super().__init__(f"grind-meter-{stage}-user-exercise")
 
-    def add(self, user_id: str, exercise: NewExercise):
+    def add(self, user_id: str, exercise: Exercise):
         item = {
             "user_id": user_id,
-            "exercise_id": str(uuid.uuid4()),
+            "exercise_id": exercise.id,
             "name": exercise.name,
             "type": exercise.type,
+            "is_active": exercise.is_active
         }
         try:
             self.table.put_item(Item=item)

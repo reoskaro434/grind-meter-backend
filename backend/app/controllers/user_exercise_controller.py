@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from backend.app.aws.dynamodb.user_exercise_dynamodb_provider import UserExerciseDynamodbProvider
 from backend.app.schemas.exercise import Exercise
 from backend.app.schemas.lift_exercise_report import LiftExerciseReport
-from backend.app.schemas.new_exercise import NewExercise
 from backend.app.schemas.user import User
 
 
@@ -18,7 +17,7 @@ class UserExerciseController:
             os.environ.get("REGION", "eu-central-1"),
             os.environ.get("STAGE", "dev"))
 
-    def add_exercise(self, user_exercise: NewExercise, user: User):
+    def add_exercise(self, user_exercise: Exercise, user: User):
         return self.__user_exercise_db.add(user.email, user_exercise)
 
     def get_exercise_page(self, user_id, page):
