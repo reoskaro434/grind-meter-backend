@@ -13,6 +13,7 @@ class UserExerciseDynamodbProvider(BaseDynamodbProvider):
         super().__init__(f"grind-meter-{stage}-user-exercise")
 
     def add(self, user_id: str, exercise: Exercise):
+        print(exercise)
         item = {
             "user_id": user_id,
             "exercise_id": exercise.id,

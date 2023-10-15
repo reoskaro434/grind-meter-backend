@@ -28,7 +28,8 @@ class UserExerciseController:
                 exercise_list.append({
                     "id": item.get("exercise_id"),
                     "name": item.get("name"),
-                    "type": item.get("type")
+                    "type": item.get("type"),
+                    "isActive": item.get("is_active")
                 })
             return exercise_list
 

@@ -17,3 +17,17 @@ async def add_user_exercise(exercise: Exercise, user: UserDep):
 @router.get('/get-exercise/{page}')
 async def add_user_exercise(user: UserDep, page: int):
     return UserExerciseController().get_exercise_page(user.email, page)
+
+class ExerciseId(BaseModel):
+    id: str
+
+@router.post('/set-active')
+async def set_exercise_active(exercise_id: ExerciseId, user: UserDep):
+    print(exercise_id)
+    return False
+
+
+@router.post('/set-inactive')
+async def set_exercise_inactive(exercise_id: ExerciseId, user: UserDep):
+    print(exercise_id)
+    return False
