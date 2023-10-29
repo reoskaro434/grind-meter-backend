@@ -1,13 +1,10 @@
-import io
-import json
 import os
-from typing import List
 
 from fastapi import HTTPException
 
 from backend.app.aws.dynamodb.user_exercise_dynamodb_provider import UserExerciseDynamodbProvider
 from backend.app.schemas.exercise import Exercise
-from backend.app.schemas.lift_exercise_report import LiftExerciseReport
+from backend.app.schemas.exercise_id import ExerciseId
 from backend.app.schemas.user import User
 
 
@@ -29,12 +26,34 @@ class UserExerciseController:
                     "id": item.get("exercise_id"),
                     "name": item.get("name"),
                     "type": item.get("type"),
-                    "isActive": item.get("is_active")
+                    "state": item.get("exercise_state")
                 })
             return exercise_list
 
         raise HTTPException(status_code=404, detail="No exercises found")
 
+    def set_exercise_active(self, exercise_id: ExerciseId, user: User):
+        return self.__user_exercise_db.update_visibility(exercise_id.id, user.email, 'ACTIVE')
+
+    def set_exercise_inactive(self, exercise_id: ExerciseId, user: User):
+        return self.__user_exercise_db.update_visibility(exercise_id.id, user.email, 'INACTIVE')
+
+    def get_active_exercises(self, user_id, page):
+        items = self.__user_exercise_db.get_exercise_page(user_id, page)
+        if items:
+            exercise_list = []
+            for item in items:
+                state = item.get("exercise_state")
+                if state == "ACTIVE":
+                    exercise_list.append({
+                        "id": item.get("exercise_id"),
+                        "name": item.get("name"),
+                        "type": item.get("type"),
+                        "state": state
+                    })
+            return exercise_list
+
+        raise HTTPException(status_code=404, detail="No exercises found")
 
     # def get_project(self, project_id):
     #     result = self._dynamodb.get_project(project_id)

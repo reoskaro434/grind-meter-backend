@@ -5,4 +5,4 @@ class Exercise(CamelModel):
     id: str
     name: str
     type: str
-    is_active: bool
+    state: str

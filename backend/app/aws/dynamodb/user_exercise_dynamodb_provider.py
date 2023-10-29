@@ -13,13 +13,12 @@ class UserExerciseDynamodbProvider(BaseDynamodbProvider):
         super().__init__(f"grind-meter-{stage}-user-exercise")
 
     def add(self, user_id: str, exercise: Exercise):
-        print(exercise)
         item = {
             "user_id": user_id,
             "exercise_id": exercise.id,
             "name": exercise.name,
             "type": exercise.type,
-            "is_active": exercise.is_active
+            "exercise_state": exercise.state
         }
         try:
             self.table.put_item(Item=item)
@@ -53,6 +52,20 @@ class UserExerciseDynamodbProvider(BaseDynamodbProvider):
             print(error)
             return False
         return items
+
+    def update_visibility(self, exercise_id: str, user_id: str, exercise_state: str):
+        try:
+            self.table.update_item(
+                Key={"user_id": user_id, "exercise_id": exercise_id},
+                UpdateExpression="set exercise_state=:exercise_state",
+                ExpressionAttributeValues={
+                    ":exercise_state": exercise_state
+                })
+        except ClientError as error:
+            print(error)
+            return False
+        return True
+
     #
     # def get_all_user_projects(self, user_id):
     #     try:
@@ -115,15 +128,3 @@ class UserExerciseDynamodbProvider(BaseDynamodbProvider):
     #         return False
     #     return True
     #
-    # def update_visibility(self, project_id, visible):
-    #     try:
-    #         self.table.update_item(
-    #             Key={"id": project_id},
-    #             UpdateExpression="set visible=:visible",
-    #             ExpressionAttributeValues={
-    #                 ":visible": visible
-    #             })
-    #     except ClientError as error:
-    #         print(error)
-    #         return False
-    #     return True
