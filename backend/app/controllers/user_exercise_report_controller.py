@@ -11,16 +11,11 @@ class UserExerciseReportController:
         self.__user_exercise_report_db = UserExercisesReportDynamodbProvider(
             os.environ.get("REGION", "eu-central-1"),
             os.environ.get("STAGE", "dev"))
-    #
-    # def add_user_exercise_report(self, user_exercise_report: LiftExerciseReport):
-    #     project_id = self.__user_exercise_report_db.add(user_exercise_report)
-    #
-    #         return Response(json.dumps({"success": (response_picture and response_description)}),
-    #                         status=200,
-    #                         mimetype='application/json')
-    #     return Response(json.dumps({"success": False}),
-    #                     status=200,
-    #                     mimetype='application/json')
+
+    def add_user_exercise_report(self, user_exercise_report: LiftExerciseReport):
+        project_id = self.__user_exercise_report_db.add(user_exercise_report) # TODO create db connector
+
+        return True
     # def get_project(self, project_id):
     #     result = self._dynamodb.get_project(project_id)
     #     if result:

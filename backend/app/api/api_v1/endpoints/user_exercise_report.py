@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Request
-from pydantic import BaseModel
-
+from fastapi import APIRouter
 from backend.app.api.deps import UserDep
-from backend.app.controllers.access_controller import AccessController
 from backend.app.schemas.lift_exercise_report import LiftExerciseReport
 
 router = APIRouter()
 
-#
-# @router.post('/lift-report')
-# async def sign_up_endpoint(lift_exercise_report: LiftExerciseReport):
-#     return AccessController().create_account(new_user.newUser)
+
+@router.post('/add-lift-report')
+async def sign_up_endpoint(lift_exercise_report: LiftExerciseReport, user: UserDep):
+    print('hello')
+    print(lift_exercise_report)
+    print(user)
+    return True

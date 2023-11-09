@@ -31,13 +31,13 @@ class AccessController:
                                 samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                domain=".api.grind-meter.com",
+                                domain=".api.gm.perfect-projects.link" if user.get("username") == "reoskaro434@gmail.com" else ".api.grind-meter.com", # TODO fix this after buying normal domain
                                 expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
             response.set_cookie(key="username",
                                 value=base64.b64encode(user.get("username").encode()).decode(),
                                 samesite="none",
                                 secure=True,
-                                domain=".grind-meter.com",
+                                domain=".perfect-projects.link" if user.get("username") == "reoskaro434@gmail.com" else ".grind-meter.com", # TODO fix this after buying normal domain
                                 expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
             return response
         raise HTTPException(status_code=401)

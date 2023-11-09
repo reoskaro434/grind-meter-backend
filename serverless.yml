@@ -1,12 +1,8 @@
 service: ${self:custom.prefix}-backend
 
-frameworkVersion: '2'
-
 provider:
   name: aws
-  runtime: python3.8
-  lambdaHashingVersion: 20201221
-  variablesResolutionMode: 20210326
+  runtime: python3.11
   region: ${opt:region}
   stage: ${opt:stage}
   stackName: ${self:custom.prefix}-backend
@@ -23,17 +19,24 @@ provider:
     REGION: ${opt:region}
     STAGE: ${opt:stage}
 
+package:
+  excludeDevDependencies: true
+  individually: true
+  patterns:
+    - '!node_modules/**'
+    - '!data-storage/**'
+    - '!access/**'
+    - '!cert/**'
+
 custom:
-  prefix: perfect-projects-${self:provider.stage}-${self:provider.region}
-  wsgi:
-    app: backend.app
+  prefix: grind-meter-${self:provider.stage}-${self:provider.region}
   customCertificate:
-    certificateName: api-${opt:stage}-${opt:region}.perfect-projects.link
-    hostedZoneIds: Z046301435EGQHE8A33R6
+    certificateName: api.gm.perfect-projects.link
+    hostedZoneIds: Z0244622OB5I5GBJSX1D
     region: us-east-1 # This specific region is required due to an error from Serverless Domain Manager
   customDomain:
-    domainName: api-${opt:stage}-${opt:region}.perfect-projects.link
-    certificateName: api-${opt:stage}-${opt:region}.perfect-projects.link
+    domainName: api.gm.perfect-projects.link
+    certificateName: api.gm.perfect-projects.link
     createRoute53Record: true
     endpointType: edge
     securityPolicy: tls_1_2
@@ -41,14 +44,16 @@ custom:
 
 functions:
   api:
-    handler: wsgi_handler.handler
+    handler: backend.app.main.handler
+    environment:
+      STAGE: ${self:provider.stage}
     events:
-      - http: ANY /
-      - http: ANY /{proxy+}
+      - http:
+          method: any
+          path: /{proxy+}
 
 plugins:
   - serverless-deployment-bucket
-  - serverless-wsgi
   - serverless-python-requirements
   - serverless-certificate-creator
   - serverless-domain-manager
