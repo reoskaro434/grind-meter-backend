@@ -1,8 +1,6 @@
-import os
-
 from fastapi import HTTPException
 
-from backend.app.aws.dynamodb.pynamodb_model.pynamodb_exercise import PynamoDBExercise
+from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
 from backend.app.schemas.exercise import Exercise
 from backend.app.schemas.exercise_id import ExerciseId
 from backend.app.schemas.user import User
@@ -11,7 +9,7 @@ from backend.app.schemas.user import User
 class UserExerciseController:
 
     def add_exercise(self, user_exercise: Exercise, user: User):
-        pynamodb_exercise = PynamoDBExercise(
+        pynamodb_exercise = UserExercise(
             exercise_id=user_exercise.id,
             user_id=user.email,
             name=user_exercise.name,
@@ -25,7 +23,7 @@ class UserExerciseController:
 
     def get_exercise_page(self, user_id: str, page: int): # TODO fix pagination
         exercise_list = []
-        for item in PynamoDBExercise.user_id_index.query(user_id):
+        for item in UserExercise.user_id_index.query(user_id, limit=25):
             exercise_list.append({
                 "id": item.exercise_id,
                 "name": item.name,
@@ -39,28 +37,28 @@ class UserExerciseController:
         return exercise_list
 
     def set_exercise_active(self, exercise_id: ExerciseId, user: User):
-        pynamodb_exercise = PynamoDBExercise(
+        pynamodb_exercise = UserExercise(
             exercise_id=exercise_id.id,
             user_id=user.email
         )
 
-        pynamodb_exercise.update(actions=[PynamoDBExercise.exercise_state.set("ACTIVE")])
+        pynamodb_exercise.update(actions=[UserExercise.exercise_state.set("ACTIVE")])
 
         return True
 
     def set_exercise_inactive(self, exercise_id: ExerciseId, user: User):
-        pynamodb_exercise = PynamoDBExercise(
+        pynamodb_exercise = UserExercise(
             exercise_id=exercise_id.id,
             user_id=user.email
         )
 
-        pynamodb_exercise.update(actions=[PynamoDBExercise.exercise_state.set("INACTIVE")])
+        pynamodb_exercise.update(actions=[UserExercise.exercise_state.set("INACTIVE")])
 
         return True
 
     def get_active_exercises(self, user_id, page):
         exercise_list = []
-        for item in PynamoDBExercise.user_id_index.query(user_id):
+        for item in UserExercise.user_id_index.query(user_id):
             state = item.exercise_state
             if state == "ACTIVE":
                 exercise_list.append({

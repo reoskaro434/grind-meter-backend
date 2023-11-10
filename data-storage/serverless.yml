@@ -59,13 +59,13 @@ resources:
           Properties:
             TableName: ${self:custom.prefix}-user-exercise-report
             AttributeDefinitions:
-              - AttributeName: exercise_id-user_id
+              - AttributeName: exercise_id
                 AttributeType: S
-              - AttributeName: day_timestamp
-                AttributeType: S
+              - AttributeName: timestamp
+                AttributeType: N
             KeySchema:
-              - AttributeName: exercise_id-user_id
+              - AttributeName: exercise_id
                 KeyType: HASH
-              - AttributeName: day_timestamp
+              - AttributeName: timestamp
                 KeyType: RANGE
             BillingMode: PAY_PER_REQUEST

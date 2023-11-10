@@ -4,7 +4,7 @@ from pynamodb.attributes import UnicodeAttribute
 
 from backend.app.global_settings import global_settings
 
-class PynamoDBExerciseUserId(GlobalSecondaryIndex):
+class UserExerciseUserId(GlobalSecondaryIndex):
     class Meta:
         index_name = 'user_id'
         read_capacity_units = 1
@@ -12,7 +12,7 @@ class PynamoDBExerciseUserId(GlobalSecondaryIndex):
         projection = AllProjection()
 
     user_id = UnicodeAttribute(hash_key=True)
-class PynamoDBExercise(Model):
+class UserExercise(Model):
     class Meta:
         table_name = f"grind-meter-{global_settings.STAGE}-user-exercise"
         region = global_settings.REGION
@@ -23,4 +23,4 @@ class PynamoDBExercise(Model):
     type = UnicodeAttribute()
     exercise_state = UnicodeAttribute()
 
-    user_id_index = PynamoDBExerciseUserId()
+    user_id_index = UserExerciseUserId()

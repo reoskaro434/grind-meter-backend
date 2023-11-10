@@ -9,3 +9,7 @@ router = APIRouter()
 @router.post('/add-lift-report')
 async def sign_up_endpoint(lift_exercise_report: LiftExerciseReport, user: UserDep):
     return UserExerciseReportController().add_lift_exercise_report(lift_exercise_report, user.email)
+
+@router.get('/get-last-report/{exercise_id}')
+async def get_last_report(user: UserDep, exercise_id: str):
+    return UserExerciseReportController().get_last_report(user.email, exercise_id)
