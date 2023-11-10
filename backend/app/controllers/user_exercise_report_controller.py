@@ -38,27 +38,14 @@ class UserExerciseReportController:
         return report_id
 
     def get_last_report(self, user_id: str, exercise_id: str):
-        print(user_id, exercise_id)
-
-        now = datetime.now()
-        start_of_day = datetime(now.year, now.month, now.day)
-        end_of_day = datetime(now.year, now.month, now.day) + timedelta(days=1) - timedelta(seconds=1)
-
-        start = int(start_of_day.timestamp()) * 1000
-        end = int(end_of_day.timestamp()) * 1000
-
-        print(start, end)
-
-        older_timestamp = 0
-        last_report = None
-        for item in UserExerciseReport.query(exercise_id, UserExerciseReport.timestamp.between(start, end)):
-            print("Query returned item {0}".format(item))
-            if older_timestamp < item.timestamp:
-                last_report = item
-
-        if last_report:
+        for item in UserExerciseReport.query(
+            exercise_id,
+            limit=1,
+            scan_index_forward=False
+        ):
             sets = []
-            for single_set in last_report.exercise_sets:
+            #TODO check if user_id is the same or allow for every logged user to see it. Now its visible
+            for single_set in item.exercise_sets:
                 if single_set.unit == WeightUnit.G.value:
                     sets.append(ExerciseSet(
                         repetitions=single_set.repetitions,
@@ -68,4 +55,5 @@ class UserExerciseReportController:
                 raise NotImplementedError("Weight unit not supported!")
 
             return LiftExerciseReport(sets=sets)
+
         return None
