@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 
 from backend.app.api.deps import UserDep
 from backend.app.controllers.user_exercise_controller import UserExerciseController
