@@ -8,6 +8,7 @@ boto3 = "*"
 fastapi = "==0.99.1" # https://github.com/pydantic/pydantic/issues/6557
 uvicorn = {extras = ["standard"], version = "*"}
 mangum = "==0.17"
+pynamodb = "*"
 
 [dev-packages]
 

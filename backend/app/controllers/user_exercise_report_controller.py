@@ -2,20 +2,19 @@ import io
 import json
 import os
 
-from backend.app.aws.dynamodb.user_exercise_report_dynamodb_provider import UserExercisesReportDynamodbProvider
+from backend.app.aws.dynamodb.user_exercise_report_dynamodb_provider import UserExerciseReportDynamodbProvider
 from backend.app.schemas.lift_exercise_report import LiftExerciseReport
+from backend.app.schemas.user import User
 
 
 class UserExerciseReportController:
     def __init__(self):
-        self.__user_exercise_report_db = UserExercisesReportDynamodbProvider(
+        self.__user_exercise_report_db = UserExerciseReportDynamodbProvider(
             os.environ.get("REGION", "eu-central-1"),
             os.environ.get("STAGE", "dev"))
 
-    def add_user_exercise_report(self, user_exercise_report: LiftExerciseReport):
-        project_id = self.__user_exercise_report_db.add(user_exercise_report) # TODO create db connector
-
-        return True
+    def add_lift_exercise_report(self, user_exercise_report: LiftExerciseReport, user: str):
+        return self.__user_exercise_report_db.add_lift_exercise_report(user_exercise_report, user)
     # def get_project(self, project_id):
     #     result = self._dynamodb.get_project(project_id)
     #     if result:
