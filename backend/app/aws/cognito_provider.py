@@ -38,8 +38,8 @@ class CognitoProvider:
         return True
 
     def sign_in(self, user):
-        username = user.get("username")
-        password = user.get("password")
+        username = base64.b64decode(user.get("username")).decode()
+        password = base64.b64decode(user.get("password")).decode()
 
         secret_hash = self._create_secret_hash(username)
 
