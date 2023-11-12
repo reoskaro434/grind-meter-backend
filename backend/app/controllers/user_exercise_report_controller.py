@@ -1,8 +1,10 @@
 import uuid
 from datetime import datetime, timedelta
 
+from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise_report import UserExerciseReport, ExerciseSetMap
 from backend.app.enum.weight_unit import WeightUnit
+from backend.app.schemas.exercise import Exercise
 from backend.app.schemas.exercise_set import ExerciseSet
 from backend.app.schemas.lift_exercise_report import LiftExerciseReport
 from backend.app.schemas.weight import Weight
@@ -38,13 +40,15 @@ class UserExerciseReportController:
         return report_id
 
     def get_last_report(self, user_id: str, exercise_id: str):
+        exercise = UserExercise().get(exercise_id, user_id)
+
         for item in UserExerciseReport.query(
             exercise_id,
             limit=1,
             scan_index_forward=False
         ):
             sets = []
-            #TODO check if user_id is the same or allow for every logged user to see it. Now its visible
+            #TODO check if user_id is the same or allow for every logged user to see it. Now its visible UPDATE: now possible is ok
             for single_set in item.exercise_sets:
                 if single_set.unit == WeightUnit.G.value:
                     sets.append(ExerciseSet(
@@ -54,6 +58,14 @@ class UserExerciseReportController:
                     continue
                 raise NotImplementedError("Weight unit not supported!")
 
-            return LiftExerciseReport(sets=sets)
+            return LiftExerciseReport(
+                sets=sets,
+                exercise=Exercise(
+                    id=exercise.exercise_id,
+                    name=exercise.name,
+                    type=exercise.type,
+                    state=exercise.exercise_state),
+                timestamp=item.timestamp
+            )
 
         return None
