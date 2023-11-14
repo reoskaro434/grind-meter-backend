@@ -39,26 +39,33 @@ class UserExerciseReportController:
 
         return report_id
 
-    def get_last_report(self, user_id: str, exercise_id: str):
+    def get_last_report(self, user_id: str, exercise_id: str, count: int):
+        max_count = 2
+
+        if count > max_count:
+            raise ValueError(f"Max count of reports is:{max_count}")
+
         exercise = UserExercise().get(exercise_id, user_id)
 
+        item_list = []
+
         for item in UserExerciseReport.query(
-            exercise_id,
-            limit=1,
-            scan_index_forward=False
+                exercise_id,
+                limit=count,
+                scan_index_forward=False
         ):
             sets = []
-            #TODO check if user_id is the same or allow for every logged user to see it. Now its visible UPDATE: now possible is ok
+            # TODO check if user_id is the same or allow for every logged user to see it. Now its visible UPDATE: now possible is ok
             for single_set in item.exercise_sets:
                 if single_set.unit == WeightUnit.G.value:
                     sets.append(ExerciseSet(
                         repetitions=single_set.repetitions,
-                        weight=Weight(unit=WeightUnit.KG.value, mass=single_set.mass/1000),
+                        weight=Weight(unit=WeightUnit.KG.value, mass=single_set.mass / 1000),
                         index=single_set.index))
                     continue
                 raise NotImplementedError("Weight unit not supported!")
 
-            return LiftExerciseReport(
+            item_list.append(LiftExerciseReport(
                 sets=sets,
                 exercise=Exercise(
                     id=exercise.exercise_id,
@@ -66,6 +73,6 @@ class UserExerciseReportController:
                     type=exercise.type,
                     state=exercise.exercise_state),
                 timestamp=item.timestamp
-            )
+            ))
 
-        return None
+        return item_list
