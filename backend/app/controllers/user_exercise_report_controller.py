@@ -76,3 +76,40 @@ class UserExerciseReportController:
             ))
 
         return item_list
+
+    def get_reports(self, user_id: str, exercise_id: str, page: int):
+        max_count = 1
+
+        if page > max_count:
+            raise ValueError(f"current max page:{max_count}")
+
+        exercise = UserExercise().get(exercise_id, user_id)
+
+        item_list = []
+
+        for item in UserExerciseReport.query(
+                exercise_id,
+                limit=25,
+                scan_index_forward=False
+        ):
+            sets = []
+            for single_set in item.exercise_sets:
+                if single_set.unit == WeightUnit.G.value:
+                    sets.append(ExerciseSet(
+                        repetitions=single_set.repetitions,
+                        weight=Weight(unit=WeightUnit.KG.value, mass=single_set.mass / 1000),
+                        index=single_set.index))
+                    continue
+                raise NotImplementedError("Weight unit not supported!")
+
+            item_list.append(LiftExerciseReport(
+                sets=sets,
+                exercise=Exercise(
+                    id=exercise.exercise_id,
+                    name=exercise.name,
+                    type=exercise.type,
+                    state=exercise.exercise_state),
+                timestamp=item.timestamp
+            ))
+
+        return item_list
