@@ -36,6 +36,18 @@ class UserExerciseController:
 
         return exercise_list
 
+    def get_exercise(self, user_id: str, exercise_id: str):
+        try:
+            exercise = UserExercise.get(exercise_id, user_id)
+            return Exercise(
+                id=exercise.exercise_id,
+                name=exercise.name,
+                type=exercise.type,
+                state=exercise.exercise_state
+            )
+        except:
+            raise HTTPException(status_code=404, detail="No exercises found")
+
     def set_exercise_active(self, exercise_id: ExerciseId, user: User):
         pynamodb_exercise = UserExercise(
             exercise_id=exercise_id.id,
