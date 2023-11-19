@@ -54,6 +54,28 @@ resources:
                     Projection:
                       ProjectionType: "ALL"
                 BillingMode: PAY_PER_REQUEST
+        userPlan:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.prefix}-user-plan
+            AttributeDefinitions:
+              - AttributeName: user_id
+                AttributeType: S
+              - AttributeName: plan_id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+              - AttributeName: plan_id
+                KeyType: RANGE
+            GlobalSecondaryIndexes:
+              - IndexName: user_id
+                KeySchema:
+                  - AttributeName: user_id
+                    KeyType: HASH
+                Projection:
+                  ProjectionType: "ALL"
+            BillingMode: PAY_PER_REQUEST
         userExerciseReport:
           Type: AWS::DynamoDB::Table
           Properties:
