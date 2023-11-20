@@ -15,9 +15,9 @@ async def add_user_exercise(plan: Plan, user: UserDep):
     return UserPlanController().add_plan(plan, user)
 
 #
-# @router.get('/get-plan/{page}')
-# async def get_plans(user: UserDep, page: int):
-#     return UserExerciseController().get_exercise_page(user.email, page)
+@router.get('/get-plans/{page}')
+async def get_plans(user: UserDep, page: int):
+    return UserPlanController().get_plan_page(user.email, page)
 #
 # @router.get('/get-plan/{plan_id}')
 # async def get_plan(user: UserDep, exercise_id: str):

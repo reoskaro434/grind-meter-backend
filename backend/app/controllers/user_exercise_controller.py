@@ -7,8 +7,16 @@ from backend.app.schemas.user import User
 
 
 class UserExerciseController:
+    MAX_EXERCISES_PER_ACCOUNT = 30
 
     def add_exercise(self, user_exercise: Exercise, user: User):
+        item_len = len(
+            [item for item in UserExercise.user_id_index.query(user.email, limit=self.MAX_EXERCISES_PER_ACCOUNT)])
+
+        if item_len >= self.MAX_EXERCISES_PER_ACCOUNT:
+            raise HTTPException(status_code=403,
+                                detail=f"Max exercises per account reached ({self.MAX_EXERCISES_PER_ACCOUNT})")
+
         pynamodb_exercise = UserExercise(
             exercise_id=user_exercise.id,
             user_id=user.email,
@@ -21,9 +29,9 @@ class UserExerciseController:
 
         return True
 
-    def get_exercise_page(self, user_id: str, page: int): # TODO fix pagination
+    def get_exercise_page(self, user_id: str, page: int):  # TODO fix pagination
         exercise_list = []
-        for item in UserExercise.user_id_index.query(user_id, limit=25):
+        for item in UserExercise.user_id_index.query(user_id, limit=self.MAX_EXERCISES_PER_ACCOUNT):
             exercise_list.append({
                 "id": item.exercise_id,
                 "name": item.name,

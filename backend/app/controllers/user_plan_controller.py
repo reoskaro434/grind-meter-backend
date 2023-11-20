@@ -9,7 +9,14 @@ from backend.app.schemas.user import User
 
 
 class UserPlanController:
+    MAX_PLANS_PER_ACCOUNT = 5
+
     def add_plan(self, user_plan: Plan, user: User):
+        item_len = len([item for item in UserPlan.user_id_index.query(user.email, limit=self.MAX_PLANS_PER_ACCOUNT)])
+
+        if item_len >= self.MAX_PLANS_PER_ACCOUNT:
+            raise HTTPException(status_code=403, detail=f"Max plans per account reached ({self.MAX_PLANS_PER_ACCOUNT})")
+
         pynamodb_exercise = UserPlan(
             plan_id=user_plan.id,
             user_id=user.email,
@@ -20,22 +27,21 @@ class UserPlanController:
         pynamodb_exercise.save()
 
         return True
-    #
-    # def get_exercise_page(self, user_id: str, page: int): # TODO fix pagination
-    #     exercise_list = []
-    #     for item in UserExercise.user_id_index.query(user_id, limit=25):
-    #         exercise_list.append({
-    #             "id": item.exercise_id,
-    #             "name": item.name,
-    #             "type": item.type,
-    #             "state": item.exercise_state
-    #         })
-    #
-    #     if not exercise_list:
-    #         raise HTTPException(status_code=404, detail="No exercises found")
-    #
-    #     return exercise_list
-    #
+
+    def get_plan_page(self, user_id: str, page: int): # TODO fix pagination
+        plan_list = []
+        for item in UserPlan.user_id_index.query(user_id, limit=self.MAX_PLANS_PER_ACCOUNT):
+            plan_list.append({
+                "id": item.plan_id,
+                "name": item.name,
+                "state": item.plan_state
+            })
+
+        if not plan_list:
+            raise HTTPException(status_code=404, detail="No plans found")
+
+        return plan_list
+
     # def get_exercise(self, user_id: str, exercise_id: str):
     #     try:
     #         exercise = UserExercise.get(exercise_id, user_id)
