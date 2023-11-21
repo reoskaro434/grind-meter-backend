@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import HTTPException
 
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
@@ -41,6 +43,11 @@ class UserPlanController:
             raise HTTPException(status_code=404, detail="No plans found")
 
         return plan_list
+
+    def save_exercises(self, user_id: str, plan_id: str, exercises_list: List[str]):
+        print(user_id)
+        print(plan_id)
+        print(exercises_list)
 
     # def get_exercise(self, user_id: str, exercise_id: str):
     #     try:
