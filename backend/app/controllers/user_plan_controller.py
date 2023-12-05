@@ -44,11 +44,34 @@ class UserPlanController:
 
         return plan_list
 
-    def save_exercises(self, user_id: str, plan_id: str, exercises_list: List[str]):
-        print(user_id)
-        print(plan_id)
-        print(exercises_list)
+    def save_exercises(self, user_id: str, plan_id: str, exercise_id_list: List[str]):
+        plan = UserPlan(plan_id, user_id)
 
+        plan.update(actions=[UserPlan.exercise_id_list.set(exercise_id_list)])
+
+        return True
+
+    def get_exercises(self, user_id: str, plan_id: str):
+        plan = UserPlan.get(plan_id, user_id)
+        exercises = []
+        exercise_id_list = plan.exercise_id_list
+
+        for exercise_id in exercise_id_list:
+            item = UserExercise.get(exercise_id, user_id)
+
+            exercises.append({
+                "id": item.exercise_id,
+                "name": item.name,
+                "type": item.type,
+                "state": item.exercise_state
+            })
+
+        return exercises
+
+    def get_exercises_id(self, user_id: str, plan_id: str):
+        plan = UserPlan.get(plan_id, user_id)
+
+        return plan.exercise_id_list
     # def get_exercise(self, user_id: str, exercise_id: str):
     #     try:
     #         exercise = UserExercise.get(exercise_id, user_id)
