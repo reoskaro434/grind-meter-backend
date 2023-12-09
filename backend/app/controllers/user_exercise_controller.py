@@ -7,7 +7,7 @@ from backend.app.schemas.user import User
 
 
 class UserExerciseController:
-    MAX_EXERCISES_PER_ACCOUNT = 30
+    MAX_EXERCISES_PER_ACCOUNT = 50
 
     def add_exercise(self, user_exercise: Exercise, user: User):
         item_len = len(
@@ -92,3 +92,13 @@ class UserExerciseController:
             raise HTTPException(status_code=404, detail="No exercises found")
 
         return exercise_list
+
+    def rename(self, exercise_id: str, email: str, name: str):
+        pynamodb_exercise = UserExercise(
+            exercise_id=exercise_id,
+            user_id=email
+        )
+
+        pynamodb_exercise.update(actions=[UserExercise.name.set(name)])
+
+        return True

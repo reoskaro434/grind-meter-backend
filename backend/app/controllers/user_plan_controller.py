@@ -72,6 +72,14 @@ class UserPlanController:
         plan = UserPlan.get(plan_id, user_id)
 
         return plan.exercise_id_list
+
+    def rename(self, id, email, name):
+        plan = UserPlan(id, email)
+
+        plan.update(actions=[UserPlan.name.set(name)])
+
+        return True
+
     # def get_exercise(self, user_id: str, exercise_id: str):
     #     try:
     #         exercise = UserExercise.get(exercise_id, user_id)

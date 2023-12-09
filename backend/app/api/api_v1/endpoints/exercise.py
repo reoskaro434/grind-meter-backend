@@ -18,8 +18,12 @@ async def get_exercises(user: UserDep, page: int):
     return UserExerciseController().get_exercise_page(user.email, page)
 
 @router.get('/get-exercise/{exercise_id}')
-async def get_exercises(user: UserDep, exercise_id: str):
+async def get_exercise(user: UserDep, exercise_id: str):
     return UserExerciseController().get_exercise(user.email, exercise_id)
+
+@router.post('/update')
+async def update(exercise: Exercise, user: UserDep):
+    return UserExerciseController().rename(exercise.id, user.email, exercise.name)
 
 @router.post('/set-active')
 async def set_exercise_active(exercise_id: ExerciseId, user: UserDep):

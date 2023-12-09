@@ -1,10 +1,9 @@
-import base64
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from backend.app.aws.cognito_provider import CognitoProvider
 from backend.app.aws.secret_provider import SecretProvider
-from datetime import datetime
+from datetime import datetime, timedelta
 from backend.app.global_settings import global_settings as g
 
 class AccessController:
@@ -19,36 +18,64 @@ class AccessController:
             self._cognito_pool_data.get("COGNITO_POOL_CLIENT_ID"),
             self._cognito_pool_data.get("COGNITO_POOL_CLIENT_SECRET"))
 
+    def __get_expiry(self, minutes):
+        expiry = datetime.utcnow()
+        expiry += timedelta(minutes=minutes)
+        return expiry.strftime('%a, %d-%b-%Y %T GMT')
+
+    def __get_domain(self, username):
+        return ".gm.perfect-projects.link" if username == "cmVzYW50ZXI=" else ".grind-meter.com" # TODO fix this after buying normal domain
+
     def sign_in(self, user):
         cognito_result = self._cognito_provider.sign_in(user)
         if cognito_result is not False:
+            username = user.get("username")
             payload = {
-                "accessToken": cognito_result["AuthenticationResult"]["AccessToken"],
+                "status": True,
             }
             response = JSONResponse(content={"payload": payload})
+            response.set_cookie(key="accessToken",
+                                value=cognito_result["AuthenticationResult"]["AccessToken"],
+                                samesite="strict",
+                                secure=True,
+                                httponly=True,
+                                domain=self.__get_domain(username),
+                                expires=self.__get_expiry(g.ACCESS_TOKEN_EXP_MIN))
             response.set_cookie(key="refreshToken",
                                 value=cognito_result["AuthenticationResult"]["RefreshToken"],
                                 samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                domain=".api.gm.perfect-projects.link" if user.get("username") == "cmVzYW50ZXI=" else ".api.grind-meter.com", # TODO fix this after buying normal domain
-                                expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
+                                domain=self.__get_domain(username),
+                                expires=self.__get_expiry(g.REFRESH_TOKEN_EXP_MIN))
             response.set_cookie(key="username",
-                                value=user.get("username"),
+                                value=username,
                                 samesite="none",
                                 secure=True, # "cmVzYW50ZXI=" == "resanter"
-                                domain=".gm.perfect-projects.link" if user.get("username") == "cmVzYW50ZXI=" else ".grind-meter.com", # TODO fix this after buying normal domain
-                                expires=int(datetime.now().timestamp() + g.REFRESH_TOKEN_EXP_MIN * 60))
+                                domain=self.__get_domain(username),
+                                expires=self.__get_expiry(g.REFRESH_TOKEN_EXP_MIN))
             return response
         raise HTTPException(status_code=401)
 
     def refresh_token(self, refresh_token, username):
-        response = self._cognito_provider.refresh_token(refresh_token, username)
-        if response is not False:
-            payload = {
-                "accessToken": response["AuthenticationResult"]["AccessToken"]
+        cognito_response = self._cognito_provider.refresh_token(refresh_token, username)
+        if cognito_response is not False:
+            response_body = {
+                "payload": {
+                    "status": True,
+                }
             }
-            return {"payload": payload}
+
+            response = JSONResponse(content=response_body)
+
+            response.set_cookie(key="accessToken",
+                                value=cognito_response["AuthenticationResult"]["AccessToken"],
+                                samesite="strict",
+                                secure=True,
+                                httponly=True,
+                                domain=self.__get_domain(username),
+                                expires=self.__get_expiry(g.ACCESS_TOKEN_EXP_MIN))
+            return response
 
         raise HTTPException(status_code=401)
 

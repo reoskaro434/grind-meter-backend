@@ -6,9 +6,13 @@ from backend.app.aws.secret_provider import SecretProvider
 from backend.app.global_settings import global_settings as g
 from backend.app.schemas.user import UserAuthorized
 
-
+def __raise_exception():
+    raise HTTPException(status_code=401, detail="Cannot get current user")
 async def get_current_user(request: Request):
-    access_token = request.headers.get('authorization')
+    access_token = request.cookies.get("accessToken")
+
+    if not access_token:
+        __raise_exception()
 
     cognito_pool_data = SecretProvider(
         g.REGION,
@@ -21,7 +25,7 @@ async def get_current_user(request: Request):
 
     user = cognito_provider.get_user(access_token)
     if not user:
-        raise HTTPException(status_code=401, detail="Cannot get current user")
+        __raise_exception()
 
     # Get email from array of obj
     email_obj = [obj for obj in user.get("UserAttributes") if obj.get("Name") == "email"]

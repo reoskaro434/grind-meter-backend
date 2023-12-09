@@ -12,6 +12,10 @@ router = APIRouter()
 async def add_user_exercise(plan: Plan, user: UserDep):
     return UserPlanController().add_plan(plan, user)
 
+@router.post('/update')
+async def update(plan: Plan, user: UserDep):
+    return UserPlanController().rename(plan.id, user.email, plan.name)
+
 @router.get('/get-plans/{page}')
 async def get_plans(user: UserDep, page: int):
     return UserPlanController().get_plan_page(user.email, page)
