@@ -24,7 +24,7 @@ class AccessController:
         return expiry.strftime('%a, %d-%b-%Y %T GMT')
 
     def __get_domain(self, username):
-        return ".gm.perfect-projects.link" if username == "cmVzYW50ZXI=" else ".grind-meter.com" # TODO fix this after buying normal domain
+        return ".gm.perfect-projects.link" if username == "cmVzYW50ZXI=" or username == "resanter" else ".grind-meter.com" # TODO fix this after buying normal domain
 
     def sign_in(self, user):
         cognito_result = self._cognito_provider.sign_in(user)

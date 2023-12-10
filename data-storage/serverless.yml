@@ -91,3 +91,18 @@ resources:
               - AttributeName: timestamp
                 KeyType: RANGE
             BillingMode: PAY_PER_REQUEST
+        plansExercises:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.prefix}-plans-exercises
+            AttributeDefinitions:
+              - AttributeName: plan_id
+                AttributeType: S
+              - AttributeName: exercise_id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: plan_id
+                KeyType: HASH
+              - AttributeName: exercise_id
+                KeyType: RANGE
+            BillingMode: PAY_PER_REQUEST

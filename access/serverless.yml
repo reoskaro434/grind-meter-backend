@@ -41,7 +41,7 @@ resources:
     GrindMeterUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        AccessTokenValidity: 5
+        AccessTokenValidity: 61
         ClientName: ${self:custom.prefix}
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
@@ -57,4 +57,3 @@ resources:
           RefreshToken: days
         WriteAttributes:
           - preferred_username
-          - email
