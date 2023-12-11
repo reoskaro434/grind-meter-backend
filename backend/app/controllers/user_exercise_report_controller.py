@@ -105,8 +105,7 @@ class UserExerciseReportController:
                 exercise=Exercise(
                     id=exercise.exercise_id,
                     name=exercise.name,
-                    type=exercise.type,
-                    state=exercise.exercise_state),
+                    type=exercise.type),
                 timestamp=item.timestamp
             ))
 

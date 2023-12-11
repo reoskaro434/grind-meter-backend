@@ -48,8 +48,7 @@ class UserExerciseController:
             return Exercise(
                 id=exercise.exercise_id,
                 name=exercise.name,
-                type=exercise.type,
-                state=exercise.exercise_state
+                type=exercise.type
             )
         except:
             raise HTTPException(status_code=404, detail="No exercises found")
@@ -61,5 +60,10 @@ class UserExerciseController:
         )
 
         pynamodb_exercise.update(actions=[UserExercise.name.set(name)])
+
+        return True
+
+    def delete(self, exercise_id, email):
+        UserExercise.get(exercise_id, email).delete()
 
         return True

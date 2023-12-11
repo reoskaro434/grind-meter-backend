@@ -20,6 +20,10 @@ async def add_user_exercise(user: UserDep, plan_id: str):
 async def update(plan: Plan, user: UserDep):
     return UserPlanController().rename(plan.id, user.email, plan.name)
 
+@router.delete('/delete/{plan_id}')
+async def delete(plan_id: str, user: UserDep):
+    return UserPlanController().delete(plan_id, user.email)
+
 @router.get('/get-plans')
 async def get_plans(user: UserDep):
     return UserPlanController().get_plans_for_account(user.email)

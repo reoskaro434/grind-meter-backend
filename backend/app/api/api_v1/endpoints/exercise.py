@@ -22,3 +22,7 @@ async def get_exercise(user: UserDep, exercise_id: str):
 @router.post('/update')
 async def update(exercise: Exercise, user: UserDep):
     return UserExerciseController().rename(exercise.id, user.email, exercise.name)
+
+@router.delete('/delete/{exercise_id}')
+async def delete(exercise_id: str, user: UserDep):
+    return UserExerciseController().delete(exercise_id, user.email)

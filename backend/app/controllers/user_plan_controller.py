@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import HTTPException
+from pynamodb.exceptions import DoesNotExist
 
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
 from backend.app.aws.dynamodb.pynamodb_model.user_plan import UserPlan
@@ -53,13 +54,16 @@ class UserPlanController:
         exercise_id_list = plan.exercise_id_list
 
         for exercise_id in exercise_id_list:
-            item = UserExercise.get(exercise_id, user_id)
+            try:
+                item = UserExercise.get(exercise_id, user_id)
 
-            exercises.append({
-                "id": item.exercise_id,
-                "name": item.name,
-                "type": item.type
-            })
+                exercises.append({
+                    "id": item.exercise_id,
+                    "name": item.name,
+                    "type": item.type
+                })
+            except DoesNotExist:  # Might be raised when user deleted exercise
+                print("Item does not exists", exercise_id, user_id)
 
         return exercises
 
@@ -68,10 +72,15 @@ class UserPlanController:
 
         return plan.exercise_id_list
 
-    def rename(self, id, email, name):
-        plan = UserPlan(id, email)
+    def rename(self, plan_id, email, name):
+        plan = UserPlan(plan_id, email)
 
         plan.update(actions=[UserPlan.name.set(name)])
+
+        return True
+
+    def delete(self, plan_id, email):
+        UserPlan.get(plan_id, email).delete()
 
         return True
 

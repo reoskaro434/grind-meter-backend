@@ -15,5 +15,5 @@ async def get_last_report(user: UserDep, exercise_id: str, count: int):
     return UserExerciseReportController().get_last_report(user.email, exercise_id, count)
 
 @router.get('/get-reports/{exercise_id}/{page}')
-async def get_last_report(user: UserDep, exercise_id: str, page: int):
+async def get_reports(user: UserDep, exercise_id: str, page: int):
     return UserExerciseReportController().get_reports(user.email, exercise_id, page)
