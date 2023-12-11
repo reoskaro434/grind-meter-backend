@@ -20,7 +20,6 @@ class UserPlan(Model):
     user_id = UnicodeAttribute(range_key=True)
     plan_id = UnicodeAttribute(hash_key=True)
     name = UnicodeAttribute()
-    plan_state = UnicodeAttribute()
     exercise_id_list = ListAttribute(default=list)
 
     user_id_index = UserPlanUserId()

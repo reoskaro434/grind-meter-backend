@@ -5,4 +5,3 @@ class Exercise(CamelModel):
     id: str
     name: str
     type: str
-    state: str

@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from backend.app.api.deps import UserDep
 from backend.app.controllers.user_exercise_controller import UserExerciseController
 from backend.app.schemas.exercise import Exercise
-from backend.app.schemas.exercise_id import ExerciseId
 
 router = APIRouter()
 
@@ -12,10 +11,9 @@ router = APIRouter()
 async def add_user_exercise(exercise: Exercise, user: UserDep):
     return UserExerciseController().add_exercise(exercise, user)
 
-
-@router.get('/get-exercises/{page}')
-async def get_exercises(user: UserDep, page: int):
-    return UserExerciseController().get_exercise_page(user.email, page)
+@router.get('/get-exercises')
+async def get_exercises(user: UserDep):
+    return UserExerciseController().get_exercise_page(user.email)
 
 @router.get('/get-exercise/{exercise_id}')
 async def get_exercise(user: UserDep, exercise_id: str):
@@ -24,16 +22,3 @@ async def get_exercise(user: UserDep, exercise_id: str):
 @router.post('/update')
 async def update(exercise: Exercise, user: UserDep):
     return UserExerciseController().rename(exercise.id, user.email, exercise.name)
-
-@router.post('/set-active')
-async def set_exercise_active(exercise_id: ExerciseId, user: UserDep):
-    return UserExerciseController().set_exercise_active(exercise_id, user)
-
-
-@router.post('/set-inactive')
-async def set_exercise_inactive(exercise_id: ExerciseId, user: UserDep):
-    return UserExerciseController().set_exercise_inactive(exercise_id, user)
-
-@router.get('/get-active-exercises')
-async def get_active_exercises(user: UserDep):
-    return UserExerciseController().get_active_exercises(user.email, 1)

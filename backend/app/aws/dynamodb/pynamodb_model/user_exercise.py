@@ -21,6 +21,5 @@ class UserExercise(Model):
     exercise_id = UnicodeAttribute(hash_key=True)
     name = UnicodeAttribute()
     type = UnicodeAttribute()
-    exercise_state = UnicodeAttribute()
 
     user_id_index = UserExerciseUserId()

@@ -55,7 +55,6 @@ class UserExerciseReportController:
                 scan_index_forward=False
         ):
             sets = []
-            # TODO check if user_id is the same or allow for every logged user to see it. Now its visible UPDATE: now possible is ok
             for single_set in item.exercise_sets:
                 if single_set.unit == WeightUnit.G.value:
                     sets.append(ExerciseSet(
@@ -70,8 +69,7 @@ class UserExerciseReportController:
                 exercise=Exercise(
                     id=exercise.exercise_id,
                     name=exercise.name,
-                    type=exercise.type,
-                    state=exercise.exercise_state),
+                    type=exercise.type),
                 timestamp=item.timestamp
             ))
 

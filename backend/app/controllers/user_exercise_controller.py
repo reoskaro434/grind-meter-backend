@@ -21,22 +21,20 @@ class UserExerciseController:
             exercise_id=user_exercise.id,
             user_id=user.email,
             name=user_exercise.name,
-            type=user_exercise.type,
-            exercise_state=user_exercise.state
+            type=user_exercise.type
         )
 
         pynamodb_exercise.save()
 
         return True
 
-    def get_exercise_page(self, user_id: str, page: int):  # TODO fix pagination
+    def get_exercise_page(self, user_id: str):
         exercise_list = []
         for item in UserExercise.user_id_index.query(user_id, limit=self.MAX_EXERCISES_PER_ACCOUNT):
             exercise_list.append({
                 "id": item.exercise_id,
                 "name": item.name,
-                "type": item.type,
-                "state": item.exercise_state
+                "type": item.type
             })
 
         if not exercise_list:
@@ -55,43 +53,6 @@ class UserExerciseController:
             )
         except:
             raise HTTPException(status_code=404, detail="No exercises found")
-
-    def set_exercise_active(self, exercise_id: ExerciseId, user: User):
-        pynamodb_exercise = UserExercise(
-            exercise_id=exercise_id.id,
-            user_id=user.email
-        )
-
-        pynamodb_exercise.update(actions=[UserExercise.exercise_state.set("ACTIVE")])
-
-        return True
-
-    def set_exercise_inactive(self, exercise_id: ExerciseId, user: User):
-        pynamodb_exercise = UserExercise(
-            exercise_id=exercise_id.id,
-            user_id=user.email
-        )
-
-        pynamodb_exercise.update(actions=[UserExercise.exercise_state.set("INACTIVE")])
-
-        return True
-
-    def get_active_exercises(self, user_id, page):
-        exercise_list = []
-        for item in UserExercise.user_id_index.query(user_id):
-            state = item.exercise_state
-            if state == "ACTIVE":
-                exercise_list.append({
-                    "id": item.exercise_id,
-                    "name": item.name,
-                    "type": item.type,
-                    "state": state
-                })
-
-        if not exercise_list:
-            raise HTTPException(status_code=404, detail="No exercises found")
-
-        return exercise_list
 
     def rename(self, exercise_id: str, email: str, name: str):
         pynamodb_exercise = UserExercise(
