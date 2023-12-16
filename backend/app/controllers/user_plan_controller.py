@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import HTTPException
 from pynamodb.exceptions import DoesNotExist
 
@@ -33,20 +31,14 @@ class UserPlanController:
         for item in UserPlan.user_id_index.query(user_id, limit=self.MAX_PLANS_PER_ACCOUNT):
             plan_list.append({
                 "id": item.plan_id,
-                "name": item.name
+                "name": item.name,
+                "exerciseIdList": item.exercise_id_list,
+                "userId": item.user_id
             })
-
         if not plan_list:
             raise HTTPException(status_code=404, detail="No plans found")
 
         return plan_list
-
-    def save_exercises(self, user_id: str, plan_id: str, exercise_id_list: List[str]):
-        plan = UserPlan(plan_id, user_id)
-
-        plan.update(actions=[UserPlan.exercise_id_list.set(exercise_id_list)])
-
-        return True
 
     def get_exercises(self, user_id: str, plan_id: str):
         plan = UserPlan.get(plan_id, user_id)
@@ -67,15 +59,15 @@ class UserPlanController:
 
         return exercises
 
-    def get_exercises_id(self, user_id: str, plan_id: str):
-        plan = UserPlan.get(plan_id, user_id)
+    def update(self, plan: Plan, email):
+        if plan.user_id != email:
+            raise HTTPException(status_code=403, detail="You are not the owner of this plan")
+        user_plan = UserPlan(plan.id, email)
 
-        return plan.exercise_id_list
-
-    def rename(self, plan_id, email, name):
-        plan = UserPlan(plan_id, email)
-
-        plan.update(actions=[UserPlan.name.set(name)])
+        user_plan.update(actions=[
+            UserPlan.name.set(plan.name),
+            UserPlan.exercise_id_list.set(plan.exercise_id_list)
+        ])
 
         return True
 
@@ -89,7 +81,7 @@ class UserPlanController:
 
         if plan:
             return {
-                "planId": plan.plan_id,
+                "id": plan.plan_id,
                 "name": plan.name,
                 "exerciseIdList": plan.exercise_id_list,
                 "userId": plan.user_id
