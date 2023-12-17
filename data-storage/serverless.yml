@@ -106,3 +106,14 @@ resources:
               - AttributeName: exercise_id
                 KeyType: RANGE
             BillingMode: PAY_PER_REQUEST
+        account:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.prefix}-user-account
+            AttributeDefinitions:
+              - AttributeName: user_id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+            BillingMode: PAY_PER_REQUEST

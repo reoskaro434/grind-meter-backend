@@ -2,7 +2,6 @@ from fastapi import HTTPException
 
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
 from backend.app.schemas.exercise import Exercise
-from backend.app.schemas.exercise_id import ExerciseId
 from backend.app.schemas.user import User
 
 

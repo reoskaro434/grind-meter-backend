@@ -77,7 +77,10 @@ class UserPlanController:
         return True
 
     def get_plan(self, email, plan_id):
-        plan = UserPlan.get(plan_id, email)
+        try:
+            plan = UserPlan.get(plan_id, email)
+        except DoesNotExist:
+            return None
 
         if plan:
             return {
