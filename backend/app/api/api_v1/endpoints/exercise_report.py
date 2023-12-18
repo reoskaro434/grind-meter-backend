@@ -7,13 +7,28 @@ router = APIRouter()
 
 
 @router.post('/add-lift-report')
-async def sign_up_endpoint(lift_exercise_report: LiftExerciseReport, user: UserDep):
+async def add_lift_report(lift_exercise_report: LiftExerciseReport, user: UserDep):
     return UserExerciseReportController().add_lift_exercise_report(lift_exercise_report, user.email)
 
 @router.get('/get-last-report/{exercise_id}/{count}')
 async def get_last_report(user: UserDep, exercise_id: str, count: int):
     return UserExerciseReportController().get_last_report(user.email, exercise_id, count)
 
+@router.get('/get-report/{exercise_id}/{timestamp}')
+async def get_last_report(user: UserDep, exercise_id: str, timestamp: int):
+    return UserExerciseReportController().get_report(user.email, exercise_id, timestamp)
 @router.get('/get-reports/{exercise_id}/{page}')
 async def get_reports(user: UserDep, exercise_id: str, page: int):
     return UserExerciseReportController().get_reports(user.email, exercise_id, page)
+@router.get('/get-reports-from-range/{exercise_id}/{start}/{end}')
+async def get_reports_from_range(user: UserDep, exercise_id: str, start: int, end: int):
+    return UserExerciseReportController().get_reports_from_range(user.email, exercise_id, start, end)
+
+@router.delete('/delete-report/{exercise_id}/{timestamp}')
+async def delete(user: UserDep, exercise_id: str, timestamp: int):
+    print(user.email, exercise_id, timestamp)
+    print(user.email, exercise_id, timestamp)
+    print(user.email, exercise_id, timestamp)
+    print(user.email, exercise_id, timestamp)
+    print(user.email, exercise_id, timestamp)
+    return UserExerciseReportController().delete(user.email, exercise_id, timestamp)

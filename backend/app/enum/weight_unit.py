@@ -1,5 +1,5 @@
 from enum import Enum
 
-class WeightUnit(Enum):
+class MeasureUnit(Enum):
     KG = "kilogram"
     G = "gram"
