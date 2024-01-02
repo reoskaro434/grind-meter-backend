@@ -55,3 +55,6 @@ class AccountController:
             "saturday": user_account.saturday,
             "sunday": user_account.sunday
         }
+
+    def delete(self, email: str):
+        raise NotImplementedError('delete account not implemented')

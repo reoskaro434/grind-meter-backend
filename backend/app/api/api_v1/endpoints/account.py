@@ -13,3 +13,7 @@ async def update(account: Account, user: UserDep):
 @router.get('/get')
 async def get(user: UserDep):
     return AccountController().get_account(user.email)
+
+@router.delete('/delete')
+async def sign_out_endpoint(user: UserDep):
+    return AccountController().delete(user.email)
