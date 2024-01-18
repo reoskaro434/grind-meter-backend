@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from fastapi import HTTPException
 from pynamodb.exceptions import DoesNotExist
@@ -7,11 +7,11 @@ from pynamodb.exceptions import DoesNotExist
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise import UserExercise
 from backend.app.aws.dynamodb.pynamodb_model.user_exercise_report import UserExerciseReport, ExerciseSetMap
 from backend.app.enum.weight_unit import MeasureUnit
-from backend.app.schemas.exercise import Exercise
-from backend.app.schemas.exercise_set import ExerciseSet
 from backend.app.schemas.lift_exercise_report import LiftExerciseReport
-from backend.app.schemas.weight import Weight
 from backend.app.services.report_service import ReportService
+from fastapi.responses import StreamingResponse
+import csv
+import io
 
 
 class UserExerciseReportController:
@@ -115,24 +115,19 @@ class UserExerciseReportController:
 
         return item_list
 
-    def get_reports_from_range(self, user_id: str, exercise_id: str, start: int, end: int):
+    def get_reports_from_range(self, user_id: str, exercise_id: str, start: int, end: int) -> list[LiftExerciseReport]:
         self.__get_exercise_if_user_valid(exercise_id, user_id)  # Validates user owns exercise
 
         item_list = []
 
         for item in UserExerciseReport.query(
-            exercise_id,
-            range_key_condition=(UserExerciseReport.timestamp.between(start, end)),
-            scan_index_forward=False
+                exercise_id,
+                range_key_condition=(UserExerciseReport.timestamp.between(start, end)),
+                scan_index_forward=False
         ):
             lift_exercise_report: LiftExerciseReport = self.report_service.get_report_from_db_item(item)
 
-            item_list.append({
-                "reportId": lift_exercise_report.report_id,
-                "exerciseId": lift_exercise_report.exercise_id,
-                "sets": lift_exercise_report.sets,
-                "timestamp": lift_exercise_report.timestamp
-            })
+            item_list.append(lift_exercise_report)
 
         return item_list
 
@@ -146,3 +141,35 @@ class UserExerciseReportController:
             pass
 
         return True
+
+    def download_csv_report(self, user_id: str, exercise_id: str, start: int, end: int):
+        report_list: list[LiftExerciseReport] = self.get_reports_from_range(user_id, exercise_id, start, end)
+
+        csv_report = [
+            ["timestamp", "date", "repetitions", "weight", "unit", "index"]
+        ]
+
+        for report in report_list:
+            exercise_date = datetime.fromtimestamp(int(report.timestamp) // 1000).strftime("%Y-%m-%d")
+
+            for single_set in report.sets:
+                record = [
+                    report.timestamp,
+                    exercise_date,
+                    single_set.repetitions,
+                    single_set.weight.mass,
+                    single_set.weight.unit,
+                    single_set.index
+                ]
+
+                csv_report.append(record)
+
+        stream = io.StringIO()
+        csv_writer = csv.writer(stream)
+        csv_writer.writerows(csv_report)
+        stream.seek(0)
+
+        response = StreamingResponse(iter([stream.read()]), media_type="text/csv")
+        response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+
+        return response

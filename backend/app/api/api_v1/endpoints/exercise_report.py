@@ -22,13 +22,20 @@ async def get_reports(user: UserDep, exercise_id: str, page: int):
     return UserExerciseReportController().get_reports(user.email, exercise_id, page)
 @router.get('/get-reports-from-range/{exercise_id}/{start}/{end}')
 async def get_reports_from_range(user: UserDep, exercise_id: str, start: int, end: int):
-    return UserExerciseReportController().get_reports_from_range(user.email, exercise_id, start, end)
+    report_list = UserExerciseReportController().get_reports_from_range(user.email, exercise_id, start, end)
 
-@router.delete('/delete-report/{exercise_id}/{timestamp}')
-async def delete(user: UserDep, exercise_id: str, timestamp: int):
-    print(user.email, exercise_id, timestamp)
-    print(user.email, exercise_id, timestamp)
-    print(user.email, exercise_id, timestamp)
-    print(user.email, exercise_id, timestamp)
-    print(user.email, exercise_id, timestamp)
-    return UserExerciseReportController().delete(user.email, exercise_id, timestamp)
+    camel_report_list = []
+
+    for report in report_list:
+        camel_report_list.append({
+            "reportId": report.report_id,
+            "exerciseId": report.exercise_id,
+            "sets": report.sets,
+            "timestamp": report.timestamp
+        })
+
+    return camel_report_list
+
+@router.get('/download-csv-report/{exercise_id}/{start}/{end}')
+async def download_csv_report(user: UserDep, exercise_id: str, start: int, end: int):
+    return UserExerciseReportController().download_csv_report(user.email, exercise_id, start, end)
