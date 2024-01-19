@@ -57,3 +57,4 @@ resources:
           RefreshToken: days
         WriteAttributes:
           - preferred_username
+          - email

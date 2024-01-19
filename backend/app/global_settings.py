@@ -9,6 +9,7 @@ class GlobalSettings(BaseModel):
     REGION: str = os.environ.get("REGION", "eu-central-1")
     STAGE: str = os.environ.get("STAGE", "dev")
     POOL_CLIENT_DATA_SECRET_NAME: str = f"GRIND_METER_COGNITO_POOL_CLIENT_DATA_{STAGE.upper()}_{REGION.upper()}"
+    DOMAIN: str = os.environ.get("DOMAIN", ".grind-meter.com")  # TODO fix this after buying normal domain
 
 
 global_settings = GlobalSettings()

@@ -10,6 +10,7 @@ class AccessController:
     def __init__(self):
         region = g.REGION
         stage = g.STAGE
+        self.domain = g.DOMAIN
         self._cognito_pool_data = SecretProvider(
             region,
             g.POOL_CLIENT_DATA_SECRET_NAME
@@ -23,8 +24,8 @@ class AccessController:
         expiry += timedelta(minutes=minutes)
         return expiry.strftime('%a, %d-%b-%Y %T GMT')
 
-    def __get_domain(self, username):
-        return ".gm.perfect-projects.link" if username == "cmVzYW50ZXI=" or username == "resanter" else ".grind-meter.com" # TODO fix this after buying normal domain
+    def __get_domain(self):
+        return self.domain
 
     def sign_in(self, user):
         cognito_result = self._cognito_provider.sign_in(user)
@@ -39,20 +40,20 @@ class AccessController:
                                 samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                domain=self.__get_domain(username),
+                                domain=self.__get_domain(),
                                 expires=self.__get_expiry(g.ACCESS_TOKEN_EXP_MIN))
             response.set_cookie(key="refreshToken",
                                 value=cognito_result["AuthenticationResult"]["RefreshToken"],
                                 samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                domain=self.__get_domain(username),
+                                domain=self.__get_domain(),
                                 expires=self.__get_expiry(g.REFRESH_TOKEN_EXP_MIN))
             response.set_cookie(key="username",
                                 value=username,
                                 samesite="none",
-                                secure=True, # "cmVzYW50ZXI=" == "resanter"
-                                domain=self.__get_domain(username),
+                                secure=True,
+                                domain=self.__get_domain(),
                                 expires=self.__get_expiry(g.REFRESH_TOKEN_EXP_MIN))
             return response
         raise HTTPException(status_code=401)
@@ -73,7 +74,7 @@ class AccessController:
                                 samesite="strict",
                                 secure=True,
                                 httponly=True,
-                                domain=self.__get_domain(username),
+                                domain=self.__get_domain(),
                                 expires=self.__get_expiry(g.ACCESS_TOKEN_EXP_MIN))
             return response
 

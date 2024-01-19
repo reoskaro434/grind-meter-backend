@@ -18,6 +18,7 @@ provider:
   environment:
     REGION: ${opt:region}
     STAGE: ${opt:stage}
+    DOMAIN: ".gm.perfect-projects.link"
 
 package:
   excludeDevDependencies: true
